@@ -46,6 +46,8 @@ The tricky part of building this was getting a small local LLM (llama3.2 — onl
 
 There's also a bunch of post-processing that fixes common LLM mistakes — like when the model puts "Amazon" as a category instead of a search term, or gets the date wrong for "this year." The code catches these and corrects them automatically.
 
+![FinAgent Architecture](architecture.png)
+
 ## Project Structure
 
 ```
