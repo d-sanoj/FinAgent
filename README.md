@@ -10,10 +10,10 @@ I built this because I wanted a quick way to check my spending without logging i
 
 <table align="center">
 <tr>
-<td width="40%">
+<td width="45%">
 <img src="https://github.com/user-attachments/assets/be04fe00-4ea0-4de4-8f79-1a6eef770775" width="100%">
 </td>
-<td width="60%">
+<td width="55%">
 <img src="https://github.com/user-attachments/assets/35fddc22-0bfe-4b89-9060-8383874be8c1" width="100%">
 <br><br>
 <img src="https://github.com/user-attachments/assets/812dc429-32a4-408f-8ec5-b27325d6c368" width="100%">
