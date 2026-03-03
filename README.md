@@ -10,20 +10,22 @@ I built this because I wanted a quick way to check my spending without logging i
 ![E8CE9BB6-1A76-43A3-AAE1-2C8A00617582](https://github.com/user-attachments/assets/35fddc22-0bfe-4b89-9060-8383874be8c1)
 ![3AB60B70-C6D7-44F2-BC4E-3D483BCCF19A](https://github.com/user-attachments/assets/812dc429-32a4-408f-8ec5-b27325d6c368)
 
-<table>
-  <tr>
-    <!-- Large Left Image -->
-    <td width="60%">
-      <img src="https://github.com/user-attachments/assets/be04fe00-4ea0-4de4-8f79-1a6eef770775" width="100%" />
-    </td>
+<br>
 
-    <!-- Right Side (Stacked) -->
-    <td width="40%">
-      <img src="https://github.com/user-attachments/assets/35fddc22-0bfe-4b89-9060-8383874be8c1" width="100%" /><br/><br/>
-      <img src="https://github.com/user-attachments/assets/812dc429-32a4-408f-8ec5-b27325d6c368" width="100%" />
-    </td>
-  </tr>
+<table align="center">
+<tr>
+<td width="65%">
+<img src="https://github.com/user-attachments/assets/be04fe00-4ea0-4de4-8f79-1a6eef770775" width="100%">
+</td>
+<td width="35%">
+<img src="https://github.com/user-attachments/assets/35fddc22-0bfe-4b89-9060-8383874be8c1" width="100%">
+<br><br>
+<img src="https://github.com/user-attachments/assets/812dc429-32a4-408f-8ec5-b27325d6c368" width="100%">
+</td>
+</tr>
 </table>
+
+<br>
 
 
 ## What It Does
