@@ -4,6 +4,11 @@ FinAgent is a Telegram bot that connects to your bank accounts through [SimpleFi
 
 I built this because I wanted a quick way to check my spending without logging into five different bank apps. Now I just open Telegram and ask things like "how much did I spend on Amazon this year?" and get an answer in seconds.
 
+**Here are some examples for the chat**
+![E4EAC0A2-DE11-4CE0-AC7D-F694CCF39B09](https://github.com/user-attachments/assets/837593d4-7f17-4190-b77e-1ace89c3dad6)
+![E8CE9BB6-1A76-43A3-AAE1-2C8A00617582](https://github.com/user-attachments/assets/736c4756-52b2-4329-99c5-cb7ba9e288e2)
+![3AB60B70-C6D7-44F2-BC4E-3D483BCCF19A](https://github.com/user-attachments/assets/f7ce78a2-2a6b-47f3-a914-48561f0aaf36)
+
 ## What It Does
 
 **Ask questions in plain English, get real answers from your actual bank data.**
