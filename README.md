@@ -1,6 +1,6 @@
 # FinAgent — Your Personal Finance AI on Telegram
 
-FinAgent is a Telegram bot that connects to your bank accounts through [SimpleFin](https://www.simplefin.org/) and lets you ask questions about your money in plain English. It supports two LLM backends — run it **fully locally** with [Ollama](https://ollama.ai/) for complete privacy, or use [Groq's free API](https://console.groq.com/) for faster responses and a more powerful model.
+FinAgent is a Telegram bot that connects to your bank accounts through [SimpleFin](https://www.simplefin.org/) and lets you ask questions about your money in plain English. It supports two LLM backends — run it **fully locally** with [Ollama](https://ollama.ai/) for complete privacy, or use [Groq's free API](https://console.groq.com/) for faster responses and a more powerful model. Host it on your own Raspberry Pi for 24/7 remote access while keeping your data entirely under your control.
 
 I built this because I wanted a quick way to check my spending without logging into five different bank apps. Now I just open Telegram and ask things like "how much did I spend on Amazon this year?" and get an answer in seconds.
 
