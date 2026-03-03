@@ -1,6 +1,6 @@
 # FinAgent — Your Personal Finance AI on Telegram
 
-FinAgent is a private, locally-powered financial assistant that connects to your bank accounts through [SimpleFin](https://www.simplefin.org/) and lets you ask questions about your money through Telegram. No cloud APIs, no subscription fees — everything runs on your machine using [Ollama](https://ollama.ai/).
+FinAgent is a Telegram bot that connects to your bank accounts through [SimpleFin](https://www.simplefin.org/) and lets you ask questions about your money in plain English. It supports two LLM backends — run it **fully locally** with [Ollama](https://ollama.ai/) for complete privacy, or use [Groq's free API](https://console.groq.com/) for faster responses and a more powerful model.
 
 I built this because I wanted a quick way to check my spending without logging into five different bank apps. Now I just open Telegram and ask things like "how much did I spend on Amazon this year?" and get an answer in seconds.
 
@@ -49,7 +49,9 @@ FinAgent/
 ### Prerequisites
 
 - **Python 3.10+**
-- **Ollama** — Install from [ollama.ai](https://ollama.ai/)
+- **LLM backend** (pick one):
+  - **Ollama** — Install from [ollama.ai](https://ollama.ai/) for fully local, private inference
+  - **Groq API key** — Get a free key at [console.groq.com](https://console.groq.com/keys) for cloud inference (faster, no GPU needed)
 - **A SimpleFin account** — For pulling bank transactions ([simplefin.org](https://www.simplefin.org/))
 - **A Telegram account** — For the bot interface
 
@@ -112,9 +114,14 @@ cp .env.example .env   # or just edit .env directly
 Your `.env` should have at minimum:
 
 ```env
-# Ollama (local LLM)
+# LLM — Option A: Local Ollama (default)
 OLLAMA_BASE_URL=http://localhost:11434/v1
 OLLAMA_MODEL=llama3.2
+
+# LLM — Option B: Groq Cloud (uncomment to use instead of Ollama)
+# If GROQ_API_KEY is set, the bot automatically switches to Groq.
+# GROQ_API_KEY=gsk_your_key_here
+# GROQ_MODEL=llama-3.3-70b-versatile
 
 # Telegram
 TELEGRAM_BOT_TOKEN=your-bot-token-from-botfather
@@ -124,6 +131,8 @@ TELEGRAM_ALLOWED_USERS=your-telegram-user-id
 SIMPLEFIN_USERNAME=your-simplefin-username
 SIMPLEFIN_PASSWORD=your-simplefin-password
 ```
+
+> **Ollama vs Groq:** Ollama runs everything on your machine — fully private but requires a decent CPU/GPU. Groq is a free cloud API that runs a much larger model (70B vs 3B) so responses are more accurate and faster, but your queries leave your machine. Pick whichever you prefer — the bot auto-detects based on which key is set.
 
 > **Finding your Telegram user ID:** Send a message to your bot, then check the terminal logs — it prints `Message from <YOUR_ID>: ...` You can add that ID to `TELEGRAM_ALLOWED_USERS` to lock it down.
 
@@ -162,18 +171,18 @@ Or just type any question naturally:
 
 ## Privacy & Security
 
-- **Everything runs locally.** Your financial data never leaves your machine.
-- **No cloud LLM calls.** Ollama runs the AI model on your own hardware.
+- **With Ollama:** Everything runs locally. Your financial data and queries never leave your machine.
+- **With Groq:** Your transaction data stays local. Only the question text is sent to Groq's API for processing — no raw financial data is shared.
 - **Bot is owner-locked.** Only your Telegram user ID can interact with the bot.
 - **Credentials stay local.** All tokens and passwords live in `.env` which should be in `.gitignore`.
 
 ## Tech Stack
 
-- **LLM:** Ollama with llama3.2 (3B parameters) — runs on any modern Mac/PC
+- **LLM:** Ollama (local, 3B model) or Groq (cloud, 70B model) — auto-detected from `.env`
 - **Data:** Pandas + PyArrow for transaction analysis
 - **Bot:** python-telegram-bot (polling mode — no server exposure needed)
 - **Bank Data:** SimpleFin API for account aggregation
-- **API Layer:** OpenAI-compatible client talking to local Ollama
+- **API Layer:** OpenAI-compatible client (works with both Ollama and Groq)
 
 ## Troubleshooting
 

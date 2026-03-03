@@ -73,12 +73,28 @@ class FinancialChatEngine:
 
     def __init__(self, data_loader: FinancialDataLoader | None = None):
         self._loader = data_loader or FinancialDataLoader()
-        # Use Ollama's OpenAI-compatible API running locally
-        self._client = OpenAI(
-            base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1"),
-            api_key="ollama",  # Ollama doesn't need a real key
-        )
-        self._model = os.environ.get("OLLAMA_MODEL", "llama3.2")
+
+        # Auto-detect LLM provider: Groq (cloud) or Ollama (local)
+        groq_key = os.environ.get("GROQ_API_KEY", "").strip()
+        if groq_key:
+            # Groq Cloud API — fast, free tier, no local GPU needed
+            self._client = OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=groq_key,
+            )
+            self._model = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+            self._provider = "groq"
+            logger.info("Using Groq API (model: %s)", self._model)
+        else:
+            # Local Ollama — fully private, no API key needed
+            self._client = OpenAI(
+                base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1"),
+                api_key="ollama",
+            )
+            self._model = os.environ.get("OLLAMA_MODEL", "llama3.2")
+            self._provider = "ollama"
+            logger.info("Using Ollama (model: %s)", self._model)
+
         # Per-user message history  (phone → list of messages)
         self._history: dict[str, list[dict]] = {}
 
