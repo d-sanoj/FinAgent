@@ -181,7 +181,6 @@ Open Telegram, find your bot, and start chatting!
 | `/start` | Welcome message with usage examples |
 | `/overview` | Full financial dashboard — balance, spending, income, savings |
 | `/reload` | Syncs fresh data from SimpleFin and reloads |
-| `/summary` | Quick data stats (transaction count, date range, accounts) |
 | `/help` | Shows available commands |
 
 Or just type any question naturally:
