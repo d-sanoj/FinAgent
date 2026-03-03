@@ -12,6 +12,7 @@ Setup:
 
 import os
 import logging
+import pandas as pd
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -39,19 +40,42 @@ def init_engine(chat_engine: FinancialChatEngine) -> None:
 # ── Command handlers ─────────────────────────────────────────────────
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /start command."""
+    """Handle /start command — mini overview + command list."""
+    overview_text = ""
+    if engine is not None:
+        try:
+            df = engine._loader.get_df()
+            if not df.empty:
+                from datetime import datetime as dt
+                now = dt.now()
+                # Bank balance
+                bank = df[(df["account"] == "bank") & df["balance"].notna()].sort_values("date", ascending=False)
+                bal = f"${bank.iloc[0]['balance']:,.2f}" if not bank.empty else "N/A"
+                # This month spending
+                month_start = now.replace(day=1)
+                tm = df[(df["date"] >= pd.Timestamp(month_start)) & (df["type"] == "debit")]
+                spent = f"${tm['amount'].abs().sum():,.2f}"
+                overview_text = (
+                    f"\n\n"
+                    f"🏦 Bank Balance: {bal}\n"
+                    f"💸 Spent this month: {spent}\n"
+                )
+        except Exception:
+            pass
+
     await update.message.reply_text(
-        "💰 *FinAgent — Your Financial Assistant*\n\n"
-        "Just send me any question about your finances\\!\n\n"
-        "Examples:\n"
-        "• How much did I spend on food last month?\n"
-        "• What's my bank balance?\n"
-        "• Show my top spending categories\n\n"
-        "Commands:\n"
-        "• /reload — Refresh data from latest sync\n"
-        "• /summary — Quick data overview\n"
-        "• /help — Show this message",
-        parse_mode="MarkdownV2",
+        f"💰 FinAgent — Your Financial Assistant\n"
+        f"{'━' * 28}"
+        f"{overview_text}\n"
+        f"💬 Just type any question about your finances!\n\n"
+        f"Examples:\n"
+        f"  • How much did I spend on food last month?\n"
+        f"  • What's my bank balance?\n"
+        f"  • Show me Amazon transactions this year\n\n"
+        f"Commands:\n"
+        f"  /overview — Full financial dashboard\n"
+        f"  /reload — Sync fresh data from SimpleFin\n"
+        f"  /help — Show this message"
     )
 
 
@@ -95,13 +119,6 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_text(f"✅ {reload_result}")
 
 
-async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /summary command."""
-    if engine is None:
-        await update.message.reply_text("⚠️ Bot is still starting up.")
-        return
-    summary = engine._loader.get_summary()
-    await update.message.reply_text(f"📊 Data Summary\n\n{summary}")
 
 
 async def overview_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -193,7 +210,6 @@ def main():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("reload", reload_command))
-    app.add_handler(CommandHandler("summary", summary_command))
     app.add_handler(CommandHandler("overview", overview_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
