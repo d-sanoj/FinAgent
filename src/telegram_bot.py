@@ -41,42 +41,22 @@ def init_engine(chat_engine: FinancialChatEngine) -> None:
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /start command — mini overview + command list."""
-    overview_text = ""
-    if engine is not None:
-        try:
-            df = engine._loader.get_df()
-            if not df.empty:
-                from datetime import datetime as dt
-                now = dt.now()
-                # Bank balance
-                bank = df[(df["account"] == "bank") & df["balance"].notna()].sort_values("date", ascending=False)
-                bal = f"${bank.iloc[0]['balance']:,.2f}" if not bank.empty else "N/A"
-                # This month spending
-                month_start = now.replace(day=1)
-                tm = df[(df["date"] >= pd.Timestamp(month_start)) & (df["type"] == "debit")]
-                spent = f"${tm['amount'].abs().sum():,.2f}"
-                overview_text = (
-                    f"\n\n"
-                    f"Bank Balance: {bal}\n"
-                    f"Spent this month: {spent}\n"
-                )
-        except Exception:
-            pass
-
-    await update.message.reply_text(
-        f"FinAgent — Your Financial Assistant\n"
-        f"{'━' * 28}"
-        f"{overview_text}\n"
-        f"Just type any question about your finances!\n\n"
-        f"Examples:\n"
-        f"  • How much did I spend on food last month?\n"
-        f"  • What's my bank balance?\n"
-        f"  • Show me Amazon transactions this year\n\n"
-        f"Commands:\n"
-        f"  /overview — Full financial dashboard\n"
-        f"  /reload — Sync fresh data from SimpleFin\n"
-        f"  /help — Show this message"
+    msg = (
+        "<b>FinAgent - Personal Financial Assistant</b>\n\n"
+        "FinAgent helps you understand your finances by answering questions based on your connected financial data.\n\n"
+        "<b>You can ask questions such as -</b>\n"
+        "• How much did I spend on groceries this month?\n"
+        "• What is my current account balance?\n"
+        "• Show my spending by category.\n"
+        "• How much did I spend at Amazon this year?\n\n"
+        "<b>Available Commands -</b>\n"
+        "/sync - Refresh your financial data from the SimpleFin API.\n"
+        "/summary - View a summary of your financial data.\n"
+        "/help - Display this help message.\n\n"
+        "<b>Disclaimer -</b>\n"
+        "FinAgent provides information based only on the financial data available from your connected accounts. Responses may not always reflect the latest transactions or your complete financial situation. Always verify important financial information with your bank or financial institution before making financial decisions. FinAgent is intended for informational purposes only and should not be considered professional financial advice."
     )
+    await update.message.reply_text(msg, parse_mode="HTML")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -84,8 +64,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await start_command(update, context)
 
 
-async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /reload command — sync from SimpleFin + reload data."""
+async def sync_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /sync command — sync from SimpleFin + reload data."""
     if engine is None:
         await update.message.reply_text("Bot is still starting up.")
         return
@@ -121,10 +101,10 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 
-async def overview_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /overview command — financial dashboard."""
+async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /summary command — financial dashboard."""
     if not _is_allowed(update.effective_user.id):
-        await update.message.reply_text("🔒 Sorry, this bot is private.")
+        await update.message.reply_text("Sorry, this bot is private.")
         return
     if engine is None:
         await update.message.reply_text("Bot is still starting up.")
@@ -148,7 +128,7 @@ def _is_allowed(user_id: int) -> bool:
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle any text message — pass to the AI chat engine."""
     if not _is_allowed(update.effective_user.id):
-        await update.message.reply_text("🔒 Sorry, this bot is private.")
+        await update.message.reply_text("Sorry, this bot is private.")
         return
 
     if engine is None:
@@ -209,8 +189,8 @@ def main():
     # Register handlers
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("reload", reload_command))
-    app.add_handler(CommandHandler("overview", overview_command))
+    app.add_handler(CommandHandler("sync", sync_command))
+    app.add_handler(CommandHandler("summary", summary_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # 3. Start polling (no webhook/ngrok needed!)
