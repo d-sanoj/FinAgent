@@ -52,6 +52,7 @@ Rules:
   available categories above (e.g. "food" → "Food & Dining", "gas" → "Transportation").
   For ANY other word like a merchant or store name (e.g. "Amazon", "Costco", "Netflix",
   "Walmart", "Starbucks", "AT&T"), set "search" to that keyword and leave "category" null.
+- MUTUALLY EXCLUSIVE: NEVER set BOTH "category" and "search". Pick only the most specific one. If you map to a category, set "search" to null.
 - If no dates mentioned, default to current month: "{month_start}" to "{today}"
 - "last month" = previous calendar month
 - "this year" or "in 2026" = date_start "2026-01-01", date_end "{today}"
@@ -61,7 +62,38 @@ Rules:
 - For loose category mentions like "food" or "eating out", map to "Food & Dining"
 - For "groceries" or "shopping", map to "Purchases and Refunds"
 - For "gas" or "uber", map to "Transportation"
-- STRICT RULE: ONLY answer personal finance-related questions. If the user asks for code, programming help, general knowledge, or anything completely unrelated to their finances, set "intent" to "chitchat" and set "chitchat_response" to a polite message saying you can only help with their financial data. DO NOT fulfill their non-finance request.
+- STRICT RULE: ONLY answer personal finance-related questions. If the user asks for code, programming help, general knowledge, or anything completely unrelated to their finances, set "intent" to "chitchat" and set "chitchat_response" exactly to: "I am not able to answer this question as I am built for personal finance assistance. Perhaps you could ask me about your finances." DO NOT fulfill their non-finance request.
+
+Examples:
+
+1. Standard Query (No History Needed):
+User: How much did I spend on groceries this month?
+{{
+  "intent": "spending",
+  "category": "Purchases and Refunds",
+  "search": null,
+  "account": null,
+  "date_start": "{month_start}",
+  "date_end": "{today}",
+  "top_n": null,
+  "chitchat_response": null
+}}
+
+2. Follow-up Query (Context Awareness Needed):
+Recent Chat History:
+User: How much did I spend on uber this month?
+Assistant: You spent $38.24 on Uber this month.
+User message: What about last month?
+{{
+  "intent": "spending",
+  "category": null,
+  "search": "Uber",
+  "account": null,
+  "date_start": "2026-06-01",
+  "date_end": "2026-06-30",
+  "top_n": null,
+  "chitchat_response": null
+}}
 """)
 
 FORMATTING_PROMPT = textwrap.dedent("""\
@@ -225,10 +257,17 @@ class FinancialChatEngine:
             # category (like "Amazon"), move it to search instead
             real_categories = set(df["category"].unique())
             cat = params.get("category")
+            search = params.get("search")
+            
             if cat and cat not in real_categories:
                 logger.info("'%s' is not a real category — treating as description search", cat)
                 params["search"] = cat
                 params["category"] = None
+            elif cat and search:
+                # LLMs sometimes set BOTH category and a synonym search (e.g. category="Transportation", search="transport")
+                # This breaks the pandas query because it does an AND filter. Force mutual exclusivity.
+                logger.info("Both category ('%s') and search ('%s') provided. Dropping search.", cat, search)
+                params["search"] = None
 
             # Phase 1.6: Deterministic Date Correction
             # Small models often default to 'today' even for 'this year' queries
@@ -328,7 +367,7 @@ class FinancialChatEngine:
         # Fallback to a safe chitchat intent if all retries fail (likely due to refusing to output JSON for non-finance queries)
         return {
             "intent": "chitchat",
-            "chitchat_response": "I am your financial assistant. I can only help you with questions about your spending, income, or bank balances."
+            "chitchat_response": "I am not able to answer this question as I am built for personal finance assistance. Perhaps you could ask me about your finances."
         }
 
     @staticmethod
