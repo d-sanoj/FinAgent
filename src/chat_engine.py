@@ -47,6 +47,7 @@ Recent Chat History (for context):
 {history}
 
 Rules:
+- Context Awareness: Use the Recent Chat History to resolve missing entities (like accounts, categories, or search keywords) for the current question. For example, if the previous question was about "Uber" and the user now asks "What about last month?", you MUST output "search": "Uber" and update the dates.
 - "category" vs "search": Use "category" ONLY when the user's words match one of the
   available categories above (e.g. "food" → "Food & Dining", "gas" → "Transportation").
   For ANY other word like a merchant or store name (e.g. "Amazon", "Costco", "Netflix",
