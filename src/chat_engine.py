@@ -43,6 +43,9 @@ Respond with ONLY a JSON object (no markdown, no explanation). The JSON must hav
   "chitchat_response": string or null (friendly reply if intent is chitchat)
 }}
 
+Recent Chat History (for context):
+{history}
+
 Rules:
 - "category" vs "search": Use "category" ONLY when the user's words match one of the
   available categories above (e.g. "food" → "Food & Dining", "gas" → "Transportation").
@@ -211,7 +214,7 @@ class FinancialChatEngine:
                 return "I don't have any financial data loaded yet. Please sync your data first."
 
             # Phase 1: Extract structured query intent via LLM
-            params = self._extract_intent(question, df)
+            params = self._extract_intent(question, df, user_id)
             logger.info("Extracted params (raw): %s", params)
 
             if params is None:
@@ -272,16 +275,24 @@ class FinancialChatEngine:
     # Phase 1: Intent Extraction
     # ------------------------------------------------------------------
 
-    def _extract_intent(self, question: str, df: pd.DataFrame) -> dict | None:
+    def _extract_intent(self, question: str, df: pd.DataFrame, user_id: str = "default") -> dict | None:
         """Use the LLM to extract structured query parameters from the question."""
         now = datetime.now()
         month_start = now.replace(day=1).strftime("%Y-%m-%d")
+
+        # Format history string
+        history_objs = self._history.get(user_id, [])
+        if history_objs:
+            history_str = "\n".join([f"{msg['role'].capitalize()}: {msg['content']}" for msg in history_objs])
+        else:
+            history_str = "None"
 
         prompt = EXTRACTION_PROMPT.format(
             categories=", ".join(sorted(df["category"].unique())),
             accounts=", ".join(sorted(df["account"].unique())),
             today=now.strftime("%Y-%m-%d"),
             month_start=month_start,
+            history=history_str,
         )
 
         messages = [
