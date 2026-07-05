@@ -46,18 +46,24 @@ The tricky part of building this was getting a small local LLM (llama3.2 — onl
 
 There's also a bunch of post-processing that fixes common LLM mistakes — like when the model puts "Amazon" as a category instead of a search term, or gets the date wrong for "this year." The code catches these and corrects them automatically.
 
-![FinAgent Architecture](architecture.png)
+![FinAgent Architecture](assets/architecture.png)
 
 ## Project Structure
 
 ```
 FinAgent/
-├── telegram_bot.py          # Telegram bot (main entry point)
-├── chat_engine.py           # Two-phase AI query engine
-├── data_loader.py           # Loads and merges transaction data from Parquet files
-├── sync_financial_data.py   # Pulls new transactions from SimpleFin API
-├── whatsapp_bot.py          # WhatsApp bot (optional alternative)
-├── run.py                   # WhatsApp entry point
+├── src/
+│   ├── telegram_bot.py          # Telegram bot (main entry point)
+│   ├── chat_engine.py           # Two-phase AI query engine
+│   ├── data_loader.py           # Loads and merges transaction data from Parquet files
+│   ├── sync_financial_data.py   # Pulls new transactions from SimpleFin API
+│   ├── whatsapp_bot.py          # WhatsApp bot (optional alternative)
+│   ├── run.py                   # WhatsApp entry point
+│   └── setup_simplefin.py       # Helper for SimpleFin setup
+├── archive/
+│   └── Databricks_cleaning_script.ipynb # Old data cleaning notebook
+├── assets/
+│   └── architecture.png         # Architecture diagram
 ├── start.sh                 # One-click setup & run script
 ├── requirements.txt         # Python dependencies
 ├── .env                     # Your tokens and config (not committed)
