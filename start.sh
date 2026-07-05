@@ -12,7 +12,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 # 1. Check Python
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 not found. Install it first: https://python.org"
+    echo "Python 3 not found. Install it first: https://python.org"
     exit 1
 fi
 
@@ -31,7 +31,7 @@ pip install -q -r requirements.txt
 
 # 5. Check .env
 if [ ! -f ".env" ]; then
-    echo "❌ .env file not found. Copy .env.example and fill in your tokens."
+    echo ".env file not found. Copy .env.example and fill in your tokens."
     exit 1
 fi
 
@@ -52,7 +52,7 @@ if ! curl -s http://localhost:11434/api/version > /dev/null 2>&1; then
         ollama serve &
         sleep 3
     else
-        echo "❌ Ollama not installed. Get it: https://ollama.ai"
+        echo "Ollama not installed. Get it: https://ollama.ai"
         exit 1
     fi
 fi

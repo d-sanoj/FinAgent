@@ -23,7 +23,7 @@ def setup_simplefin():
         return
         
     try:
-        print("🔄 Exchanging setup token for access credentials...")
+        print("Exchanging setup token for access credentials...")
         # Decode the token (which is a base64 encoded URL)
         claim_url = base64.b64decode(token).decode('utf-8')
         
@@ -51,7 +51,7 @@ def setup_simplefin():
         print("SimpleFin credentials successfully generated and saved to .env")
         
     except Exception as e:
-        print(f"❌ Failed to setup SimpleFin: {e}")
+        print(f"Failed to setup SimpleFin: {e}")
 
 if __name__ == "__main__":
     setup_simplefin()

@@ -57,8 +57,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 spent = f"${tm['amount'].abs().sum():,.2f}"
                 overview_text = (
                     f"\n\n"
-                    f"🏦 Bank Balance: {bal}\n"
-                    f"💸 Spent this month: {spent}\n"
+                    f"Bank Balance: {bal}\n"
+                    f"Spent this month: {spent}\n"
                 )
         except Exception:
             pass
@@ -67,7 +67,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         f"FinAgent — Your Financial Assistant\n"
         f"{'━' * 28}"
         f"{overview_text}\n"
-        f"💬 Just type any question about your finances!\n\n"
+        f"Just type any question about your finances!\n\n"
         f"Examples:\n"
         f"  • How much did I spend on food last month?\n"
         f"  • What's my bank balance?\n"
@@ -90,7 +90,7 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.message.reply_text("Bot is still starting up.")
         return
 
-    await update.message.reply_text("🔄 Syncing from SimpleFin...")
+    await update.message.reply_text("Syncing from SimpleFin...")
 
     # Step 1: Run sync to fetch new transactions
     try:
@@ -111,7 +111,7 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.message.reply_text("Sync timed out after 60s. Try again later.")
         return
     except Exception as e:
-        await update.message.reply_text(f"❌ Sync failed: {e}")
+        await update.message.reply_text(f"Sync failed: {e}")
         return
 
     # Step 2: Reload DataFrame from updated parquet files

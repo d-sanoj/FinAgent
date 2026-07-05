@@ -156,7 +156,7 @@ def receive_message():
                         send_whatsapp_message(
                             sender,
                             "I can only handle text messages right now. "
-                            "Please type your financial question! 💬",
+                            "Please type your financial question!",
                         )
 
     except Exception as e:
