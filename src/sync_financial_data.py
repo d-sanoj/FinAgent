@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # --- CONFIGURATION ---
-DATA_PATH = "gold/final_static_data"
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+DATA_PATH = os.path.join(ROOT_DIR, "gold", "final_static_data")
 SIMPLEFIN_URL = "https://beta-bridge.simplefin.org/simplefin"
 # Credentials
 SIMPLEFIN_USERNAME = os.environ.get("SIMPLEFIN_USERNAME")
@@ -157,7 +158,7 @@ def categorize_transaction(account: str, description: str, payee: str) -> str:
         
     return "Others"
 
-UPDATE_PATH = "gold/simplefin_updates.parquet"
+UPDATE_PATH = os.path.join(ROOT_DIR, "gold", "simplefin_updates.parquet")
 
 def process_and_merge():
     # 1. Load Existing Data (Static + Updates)

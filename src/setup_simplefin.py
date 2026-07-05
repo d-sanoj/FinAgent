@@ -5,7 +5,7 @@ import urllib.parse
 import re
 
 def setup_simplefin():
-    env_file = ".env"
+    env_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
     if not os.path.exists(env_file):
         return
 
@@ -16,7 +16,7 @@ def setup_simplefin():
     if "your-simplefin-username" not in env_data:
         return
         
-    print("⚠️  SimpleFin credentials not found in .env")
+    print(" SimpleFin credentials not found in .env")
     token = input("Please enter your SimpleFin setup token (or press Enter to skip): ").strip()
     if not token:
         print("No token provided, skipping SimpleFin setup.")
@@ -48,7 +48,7 @@ def setup_simplefin():
         with open(env_file, "w") as f:
             f.write(env_data)
             
-        print("✅ SimpleFin credentials successfully generated and saved to .env")
+        print("SimpleFin credentials successfully generated and saved to .env")
         
     except Exception as e:
         print(f"❌ Failed to setup SimpleFin: {e}")

@@ -72,6 +72,7 @@ STRICT RULES:
 1. ONLY use the computed result to answer. DO NOT write code, give general knowledge, or answer unrelated queries.
 2. If the user asked something unrelated to finances, gently remind them you are a financial bot and summarize the computed result anyway.
 3. Do NOT include any code, JSON, or markdown formatting in your response.
+4. Do NOT use any emojis in your response. Keep the tone completely professional.
 """)
 
 
@@ -177,7 +178,7 @@ class FinancialChatEngine:
         last_month_name = last_month_start.strftime("%B")
 
         return (
-            f"💰 Financial Overview\n"
+            f"Financial Overview\n"
             f"{'━' * 28}\n"
             f"\n"
             f"🏦 Bank Balance: {bank_str}\n"
@@ -185,13 +186,13 @@ class FinancialChatEngine:
             f"📅 {month_name} (so far)\n"
             f"  💸 Spent: ${tm_spending:,.2f}\n"
             f"  💵 Income: ${tm_income:,.2f}\n"
-            f"  {'✅' if tm_net >= 0 else '⚠️'} Net: ${tm_net:,.2f}\n"
+            f"  {'' if tm_net >= 0 else ''} Net: ${tm_net:,.2f}\n"
             f"  {change_str}\n"
             f"\n"
             f"📅 {last_month_name}\n"
             f"  💸 Spent: ${lm_spending:,.2f}\n"
             f"  💵 Income: ${lm_income:,.2f}\n"
-            f"  {'✅' if lm_net >= 0 else '⚠️'} Net: ${lm_net:,.2f}\n"
+            f"  {'' if lm_net >= 0 else ''} Net: ${lm_net:,.2f}\n"
             f"\n"
             f"📊 Top Spending ({month_name})\n"
             f"{cats_str if cats_str else '  No spending yet'}\n"
@@ -199,7 +200,7 @@ class FinancialChatEngine:
             f"📈 Year-to-Date ({now.year})\n"
             f"  Total Spent: ${ytd_spending:,.2f}\n"
             f"  Total Income: ${ytd_income:,.2f}\n"
-            f"  💰 Saved: ${ytd_saved:,.2f}\n"
+            f"  Saved: ${ytd_saved:,.2f}\n"
         )
 
     def ask(self, question: str, user_id: str = "default") -> str:
@@ -245,7 +246,7 @@ class FinancialChatEngine:
 
             # Handle chitchat
             if params.get("intent") == "chitchat":
-                response = params.get("chitchat_response", "Hey! Ask me about your finances 💰")
+                response = params.get("chitchat_response", "Hey! Ask me about your finances")
                 self._update_history(user_id, question, response)
                 return response
 
@@ -265,7 +266,7 @@ class FinancialChatEngine:
     def reload_data(self) -> str:
         """Reload financial data from disk."""
         self._loader.reload()
-        return "✅ Financial data reloaded successfully!\n" + self._loader.get_summary()
+        return "Financial data reloaded successfully!\n" + self._loader.get_summary()
 
     # ------------------------------------------------------------------
     # Phase 1: Intent Extraction
@@ -512,4 +513,4 @@ if __name__ == "__main__":
         if q.lower() in ("quit", "exit", "q"):
             break
         answer = engine.ask(q)
-        print(f"\n🤖 {answer}\n")
+        print(f"\n{answer}\n")

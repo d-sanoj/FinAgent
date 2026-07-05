@@ -64,7 +64,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             pass
 
     await update.message.reply_text(
-        f"💰 FinAgent — Your Financial Assistant\n"
+        f"FinAgent — Your Financial Assistant\n"
         f"{'━' * 28}"
         f"{overview_text}\n"
         f"💬 Just type any question about your finances!\n\n"
@@ -87,7 +87,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /reload command — sync from SimpleFin + reload data."""
     if engine is None:
-        await update.message.reply_text("⚠️ Bot is still starting up.")
+        await update.message.reply_text("Bot is still starting up.")
         return
 
     await update.message.reply_text("🔄 Syncing from SimpleFin...")
@@ -105,10 +105,10 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if result.returncode != 0:
             logger.warning("Sync stderr: %s", result.stderr[-500:] if result.stderr else "")
             await update.message.reply_text(
-                f"⚠️ Sync finished with warnings.\n{result.stderr[-200:] if result.stderr else ''}"
+                f"Sync finished with warnings.\n{result.stderr[-200:] if result.stderr else ''}"
             )
     except subprocess.TimeoutExpired:
-        await update.message.reply_text("⚠️ Sync timed out after 60s. Try again later.")
+        await update.message.reply_text("Sync timed out after 60s. Try again later.")
         return
     except Exception as e:
         await update.message.reply_text(f"❌ Sync failed: {e}")
@@ -116,7 +116,7 @@ async def reload_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Step 2: Reload DataFrame from updated parquet files
     reload_result = engine.reload_data()
-    await update.message.reply_text(f"✅ {reload_result}")
+    await update.message.reply_text(f"{reload_result}")
 
 
 
@@ -127,7 +127,7 @@ async def overview_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await update.message.reply_text("🔒 Sorry, this bot is private.")
         return
     if engine is None:
-        await update.message.reply_text("⚠️ Bot is still starting up.")
+        await update.message.reply_text("Bot is still starting up.")
         return
     await update.message.chat.send_action("typing")
     overview = engine.get_overview()
@@ -152,7 +152,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     if engine is None:
-        await update.message.reply_text("⚠️ Bot is still starting up. Try again shortly!")
+        await update.message.reply_text("Bot is still starting up. Try again shortly!")
         return
 
     user_id = str(update.effective_user.id)
@@ -215,7 +215,7 @@ def main():
 
     # 3. Start polling (no webhook/ngrok needed!)
     logger.info("=" * 60)
-    logger.info("🤖  FinAgent Telegram Bot is running!")
+    logger.info(" FinAgent Telegram Bot is running!")
     logger.info("   Send a message to your bot on Telegram.")
     logger.info("=" * 60)
 

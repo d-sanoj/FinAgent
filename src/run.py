@@ -42,7 +42,7 @@ def main():
     # 3. Start server
     port = int(os.environ.get("PORT", 5000))
     logger.info("=" * 60)
-    logger.info("🤖  FinAgent WhatsApp Bot")
+    logger.info(" FinAgent WhatsApp Bot")
     logger.info("   Webhook URL:  http://localhost:%d/webhook", port)
     logger.info("   Health check: http://localhost:%d/health", port)
     logger.info("=" * 60)

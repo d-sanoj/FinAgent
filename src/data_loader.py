@@ -12,7 +12,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "gold")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "gold")
 STATIC_PATH = os.path.join(DATA_DIR, "final_static_data")
 UPDATES_PATH = os.path.join(DATA_DIR, "simplefin_updates.parquet")
 

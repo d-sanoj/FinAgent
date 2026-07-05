@@ -169,7 +169,7 @@ def receive_message():
 def _handle_text_message(sender: str, body: str) -> None:
     """Process a text message and send a reply."""
     if engine is None:
-        send_whatsapp_message(sender, "⚠️ Bot is still starting up. Try again shortly!")
+        send_whatsapp_message(sender, "Bot is still starting up. Try again shortly!")
         return
 
     # Special commands
@@ -181,7 +181,7 @@ def _handle_text_message(sender: str, body: str) -> None:
 
     if lower == "/help":
         help_text = (
-            "💰 *FinAgent — Your Financial Assistant*\n\n"
+            "*FinAgent — Your Financial Assistant*\n\n"
             "Just ask me anything about your finances! Examples:\n\n"
             "• How much did I spend this month?\n"
             "• What's my bank balance?\n"
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     loader = FinancialDataLoader()
     init_engine(FinancialChatEngine(data_loader=loader))
 
-    print("\n🤖 FinAgent WhatsApp Bot running on http://localhost:5000")
+    print("\nFinAgent WhatsApp Bot running on http://localhost:5000")
     print("   Webhook URL: http://localhost:5000/webhook\n")
 
     app.run(host="0.0.0.0", port=5000, debug=True)
