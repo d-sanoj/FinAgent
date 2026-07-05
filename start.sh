@@ -42,6 +42,9 @@ if grep -q "your-telegram-bot-token-here" .env 2>/dev/null; then
     exit 1
 fi
 
+# 6.5 Check SimpleFin token
+python setup_simplefin.py
+
 # 7. Check Ollama
 if ! curl -s http://localhost:11434/api/version > /dev/null 2>&1; then
     echo "⚠️  Ollama not running. Starting it..."

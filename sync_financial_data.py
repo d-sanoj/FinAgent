@@ -162,12 +162,12 @@ UPDATE_PATH = "gold/simplefin_updates.parquet"
 def process_and_merge():
     # 1. Load Existing Data (Static + Updates)
     if not os.path.exists(DATA_PATH):
-        logger.error(f"Static data not found at {DATA_PATH}")
-        return
-
-    logger.info("Loading existing dataset...")
-    # Load static history
-    df_static = pd.read_parquet(DATA_PATH)
+        logger.warning(f"Static data not found at {DATA_PATH}. Starting fresh.")
+        df_static = pd.DataFrame()
+    else:
+        logger.info("Loading existing dataset...")
+        # Load static history
+        df_static = pd.read_parquet(DATA_PATH)
     
     # Load any previous updates
     if os.path.exists(UPDATE_PATH):
@@ -178,16 +178,20 @@ def process_and_merge():
         df_updates = pd.DataFrame()
         df_combined = df_static
 
-    # Type conversion
-    df_combined['date'] = pd.to_datetime(df_combined['date'])
-    df_combined['amount'] = pd.to_numeric(df_combined['amount'], errors='coerce')
-    df_combined['balance'] = pd.to_numeric(df_combined['balance'], errors='coerce')
+    # Type conversion if not empty
+    if not df_combined.empty:
+        df_combined['date'] = pd.to_datetime(df_combined['date'])
+        df_combined['amount'] = pd.to_numeric(df_combined['amount'], errors='coerce')
+        df_combined['balance'] = pd.to_numeric(df_combined['balance'], errors='coerce')
 
-    # Per-account max dates for deduplication
-    max_dates = df_combined.groupby('account')['date'].max().to_dict()
-    logger.info("Per-account latest dates:")
-    for acct, dt in sorted(max_dates.items()):
-        logger.info(f"  {acct}: {dt.date()}")
+        # Per-account max dates for deduplication
+        max_dates = df_combined.groupby('account')['date'].max().to_dict()
+        logger.info("Per-account latest dates:")
+        for acct, dt in sorted(max_dates.items()):
+            logger.info(f"  {acct}: {dt.date()}")
+    else:
+        max_dates = {}
+        logger.info("No previous data to determine latest dates.")
     
     # 2. Fetch last 90 days from SimpleFin
     try:
@@ -197,6 +201,7 @@ def process_and_merge():
 
     # 3. Convert to DataFrame — only keep transactions AFTER the last date per account
     new_records = []
+    current_api_balances = {}
     for acc in raw_data.get("accounts", []):
         org_name = acc["org"]["name"]
         account_name = ACCOUNT_MAPPING.get(org_name, org_name.lower())
@@ -206,6 +211,8 @@ def process_and_merge():
         
         # Grab account-level balance if available
         acc_balance = acc.get("balance")
+        if acc_balance is not None:
+            current_api_balances[account_name] = float(acc_balance)
         
         for txn in acc.get("transactions", []):
             posted_ts = txn.get("posted") or txn.get("transacted_at")
@@ -235,6 +242,18 @@ def process_and_merge():
                 "account": account_name,
                 "balance": txn_balance,
             })
+            
+        # Ensure we always add a balance snapshot for the bank account
+        if account_name == "bank" and acc_balance is not None:
+            new_records.append({
+                "date": datetime.now() + timedelta(seconds=10),
+                "description": "Current Balance Snapshot",
+                "amount": 0.0,
+                "category": "Balance Update",
+                "type": "credit",
+                "account": "bank",
+                "balance": float(acc_balance)
+            })
     
     if not new_records:
         logger.info("No new transactions found.")
@@ -255,8 +274,9 @@ def process_and_merge():
             running_balance = float(last_valid_balance_row['balance'])
             logger.info(f"Starting balance calculation from: ${running_balance:.2f} (Date: {last_valid_balance_row['date'].date()})")
         else:
-            logger.warning("No previous bank balance found! Using 0.00")
-            running_balance = 0.00
+            current_bank_bal = current_api_balances.get('bank', 0.0)
+            running_balance = current_bank_bal - bank_new['amount'].sum()
+            logger.warning(f"No previous bank balance found! Deriving starting balance from current API balance: ${running_balance:.2f}")
         
         # Sort new transactions ascending to calculate forward
         bank_new = bank_new.sort_values('date', ascending=True)
@@ -289,6 +309,7 @@ def process_and_merge():
     df_final_updates = df_final_updates.sort_values('date', ascending=False).reset_index(drop=True)
     
     # Save updates file
+    os.makedirs(os.path.dirname(UPDATE_PATH), exist_ok=True)
     df_final_updates.to_parquet(UPDATE_PATH, index=False)
     logger.info(f"Successfully updated {UPDATE_PATH}")
     logger.info(f"Total transactions in updates file: {len(df_final_updates)}")

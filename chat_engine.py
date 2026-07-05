@@ -57,14 +57,21 @@ Rules:
 - For loose category mentions like "food" or "eating out", map to "Food & Dining"
 - For "groceries" or "shopping", map to "Purchases and Refunds"
 - For "gas" or "uber", map to "Transportation"
+- STRICT RULE: ONLY answer personal finance-related questions. If the user asks for code, programming help, general knowledge, or anything completely unrelated to their finances, set "intent" to "chitchat" and set "chitchat_response" to a polite message saying you can only help with their financial data. DO NOT fulfill their non-finance request.
 """)
 
 FORMATTING_PROMPT = textwrap.dedent("""\
+You are a strict financial assistant bot.
 The user asked: "{question}"
-Here is the computed result: {result}
+Here is the computed result from their financial data: {result}
 
-Write a SHORT, friendly 1-2 sentence response summarising the answer.
-Use $ for dollar amounts with 2 decimal places. Do NOT include any code or JSON.
+Write a SHORT, friendly 1-2 sentence response summarizing the result.
+Use $ for dollar amounts with 2 decimal places.
+
+STRICT RULES:
+1. ONLY use the computed result to answer. DO NOT write code, give general knowledge, or answer unrelated queries.
+2. If the user asked something unrelated to finances, gently remind them you are a financial bot and summarize the computed result anyway.
+3. Do NOT include any code, JSON, or markdown formatting in your response.
 """)
 
 
@@ -305,7 +312,11 @@ class FinancialChatEngine:
                 messages.append({"role": "assistant", "content": reply})
                 messages.append({"role": "user", "content": "Please respond with ONLY valid JSON, no other text."})
 
-        return None
+        # Fallback to a safe chitchat intent if all retries fail (likely due to refusing to output JSON for non-finance queries)
+        return {
+            "intent": "chitchat",
+            "chitchat_response": "I am your financial assistant. I can only help you with questions about your spending, income, or bank balances."
+        }
 
     @staticmethod
     def _extract_json(text: str) -> str | None:
